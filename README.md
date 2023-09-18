@@ -10,7 +10,7 @@ It supports various backends including:
 - AWS S3
 - GCP Secrets Manager
 - [Google Sheets](#google-sheets)
-- [SOPS](https://github.com/mozilla/sops)-encrypted files
+- [SOPS](https://github.com/getsops/sops)-encrypted files
 - Terraform State
 - CredHub(Coming soon)
 
@@ -203,7 +203,7 @@ Please see the [relevant unit test cases](https://github.com/helmfile/vals/blob/
 - [GCP Secrets Manager](#gcp-secrets-manager)
 - [Google Sheets](#google-sheets)
 - [Google GCS](#google-gcs)
-- [SOPS](#sops) powered by [sops](https://github.com/mozilla/sops)
+- [SOPS](#sops) powered by [sops](https://github.com/getsops/sops)
 - [Terraform (tfstate)](#terraform-tfstate) powered by [tfstate-lookup](https://github.com/fujiwara/tfstate-lookup)
 - [Echo](#echo)
 - [File](#file)
@@ -230,9 +230,9 @@ Please see [pkg/providers](https://github.com/helmfile/vals/tree/master/pkg/prov
 
 The `auth_method` or `VAULT_AUTH_METHOD` envar configures how `vals` authenticates to HashiCorp Vault. Currently only these options are supported:
 
-* [approle](https://www.vaultproject.io/docs/auth/approle#via-the-api): it requires you pass on a `role_id` together with a `secret_id`.
-* [token](https://www.vaultproject.io/docs/auth/token): you just need creating and passing on a `VAULT_TOKEN`. If `VAULT_TOKEN` isn't set, token can be retrieved from `VAULT_TOKEN_FILE` env or `~/.vault-token` file.
-* [kubernetes](https://www.vaultproject.io/docs/auth/kubernetes): if you're running inside a Kubernetes cluster, you can use this option. It requires you [configure](https://www.vaultproject.io/docs/auth/kubernetes#configuration) a policy, a Kubernetes role, a service account and a JWT token. The login path can also be set using the environment variable `VAULT_KUBERNETES_MOUNT_POINT` (default is `/kubernetes`). You must also set `role_id` or `VAULT_ROLE_ID` envar to the Kubernetes role.
+- [approle](https://www.vaultproject.io/docs/auth/approle#via-the-api): it requires you pass on a `role_id` together with a `secret_id`.
+- [token](https://www.vaultproject.io/docs/auth/token): you just need creating and passing on a `VAULT_TOKEN`. If `VAULT_TOKEN` isn't set, token can be retrieved from `VAULT_TOKEN_FILE` env or `~/.vault-token` file.
+- [kubernetes](https://www.vaultproject.io/docs/auth/kubernetes): if you're running inside a Kubernetes cluster, you can use this option. It requires you [configure](https://www.vaultproject.io/docs/auth/kubernetes#configuration) a policy, a Kubernetes role, a service account and a JWT token. The login path can also be set using the environment variable `VAULT_KUBERNETES_MOUNT_POINT` (default is `/kubernetes`). You must also set `role_id` or `VAULT_ROLE_ID` envar to the Kubernetes role.
 
 Examples:
 
@@ -324,6 +324,7 @@ Examples:
 Decrypts the URL-safe base64-encoded ciphertext using AWS KMS. Note that URL-safe base64 encoding is
 the same as "traditional" base64 encoding, except it uses `_` and `-` in place of `/` and `+`, respectively.
 For example, to get a URL-safe base64-encoded ciphertext using the AWS CLI, you might run
+
 ```
 aws kms encrypt \
   --key-id alias/example \
@@ -334,15 +335,17 @@ aws kms encrypt \
 ```
 
 Valid values for `alg` include:
-* `SYMMETRIC_DEFAULT` (the default)
-* `RSAES_OAEP_SHA_1`
-* `RSAES_OAEP_SHA_256`
+
+- `SYMMETRIC_DEFAULT` (the default)
+- `RSAES_OAEP_SHA_1`
+- `RSAES_OAEP_SHA_256`
 
 Valid value formats for `key` include:
-* A key id `1234abcd-12ab-34cd-56ef-1234567890ab`
-* A URL-encoded key id ARN: `arn%3Aaws%3Akms%3Aus-east-2%3A111122223333%3Akey%2F1234abcd-12ab-34cd-56ef-1234567890ab`
-* A URL-encoded key alias: `alias%2FExampleAlias`
-* A URL-encoded key alias ARN: `arn%3Aaws%3Akms%3Aus-east-2%3A111122223333%3Aalias%2FExampleAlias`
+
+- A key id `1234abcd-12ab-34cd-56ef-1234567890ab`
+- A URL-encoded key id ARN: `arn%3Aaws%3Akms%3Aus-east-2%3A111122223333%3Akey%2F1234abcd-12ab-34cd-56ef-1234567890ab`
+- A URL-encoded key alias: `alias%2FExampleAlias`
+- A URL-encoded key alias ARN: `arn%3Aaws%3Akms%3Aus-east-2%3A111122223333%3Aalias%2FExampleAlias`
 
 For ciphertext encrypted with a symmetric key, the `key` field may be omitted. For ciphertext
 encrypted with a key in your own account, a plain key id or alias can be used. If the encryption
@@ -354,6 +357,7 @@ if the encryption context is `{"foo":"bar","hello":"world"}`, then you would rep
 `context=%7B%22foo%22%3A%22bar%22%2C%22hello%22%2C%22world%22%7D`.
 
 Examples:
+
 - `ref+awskms://AQICAHhy_i8hQoGLOE46PVJyinH...WwHKT0i3H0znHRHwfyC7AGZ8ek=`
 - `ref+awskms://AQICAHhy...nHRHwfyC7AGZ8ek=#/foo/bar`
 - `ref+awskms://AQICAHhy...WwHKT0i3AGZ8ek=?context=%7B%22foo%22%3A%22bar%22%2C%22hello%22%2C%22world%22%7D`
@@ -361,6 +365,7 @@ Examples:
 - `ref+awskms://AQICA...fyC7AGZ8ek=?alg=RSAES_OAEP_SHA256&key=arn%3Aaws%3Akms%3Aus-east-2%3A111122223333%3Akey%2F1234abcd-12ab-34cd-56ef-1234567890ab&context=%7B%22foo%22%3A%22bar%22%2C%22hello%22%2C%22world%22%7D`
 
 #### Google GCS
+
 - `ref+gcs://BUCKET/KEY/OF/OBJECT[?generation=ID]`
 - `ref+gcs://BUCKET/KEY/OF/OBJECT[?generation=ID]#/yaml_or_json_key/in/secret`
 
@@ -495,6 +500,7 @@ which is equivalent to the following input for `vals`:
 ```
 $ echo 'foo: ref+tfstates3://bucket-with-terraform-state/terraform.tfstate/module.vpc.aws_vpc.this[0].arn' | vals eval -f -
 ```
+
 ### Terraform in AzureRM Blob storage (tfstateazurerm)
 
 - `ref+tfstateazurerm://{resource_group_name}/{storage_account_name}/{container_name}/{blob_name}.tfstate/RESOURCE_NAME[?az_subscription_id=SUBSCRIPTION_ID]`
@@ -564,7 +570,6 @@ Examples:
 - `ref+echo://foo/bar` generates `foo/bar`
 - `ref+echo://foo/bar/baz#/foo/bar` generates `baz`. This works by the host and the path part `foo/bar/baz` generating an object `{"foo":{"bar":"baz"}}` and the fragment part `#/foo/bar` results in digging the object to obtain the value at `$.foo.bar`.
 
-
 ### File
 
 File provider reads a local text file, or the value for the specific path in a YAML/JSON file.
@@ -587,6 +592,7 @@ Retrieve secrets from Azure Key Vault. Path is used to specify the vault and sec
 
 VAULT-NAME is either a simple name if operating in AzureCloud (vault.azure.net) or the full endpoint dns name when operating against non-default azure clouds (US Gov Cloud, China Cloud, German Cloud).
 Examples:
+
 - `ref+azurekeyvault://my-vault/secret-a`
 - `ref+azurekeyvault://my-vault/secret-a/ba4f196b15f644cd9e949896a21bab0d`
 - `ref+azurekeyvault://gov-cloud-test.vault.usgovcloudapi.net/secret-b`
@@ -600,6 +606,7 @@ Other authentication methods require information to be passed in environment var
 For example, if using client credentials the required env vars are `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID` and possibly `AZURE_ENVIRONMENT` in case of accessing an Azure GovCloud.
 
 The order in which authentication methods are checked is:
+
 1. Client credentials
 2. Client certificate
 3. Username/Password
@@ -618,7 +625,6 @@ Examples:
 ### GitLab Secrets
 
 For this provider to work you require an [access token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) exported as the environment variable `GITLAB_TOKEN`.
-
 
 - `ref+gitlab://my-gitlab-server.com/project_id/secret_name?[ssl_verify=false&scheme=https&api_version=v4]`
 
